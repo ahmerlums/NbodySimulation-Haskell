@@ -1,0 +1,41 @@
+Assignment 2: 3D Barnes Hut with generalized vector and tree folding
+Deadline: Saturday 12 March 2016 @ 11:55 PM 
+25% extra credit for any parts completely finished and submitted by Saturday 5th March @ 11:55PM
+>>> Turn on notification on this post from the top right corner of this post so you'll know about comments on this post.
+In this assignment, we will extend the last assignment using either your own code or the code we wrote in class. The kind of things you will be doing will often throw a large number of errors at you. Do not panic and do not run for help right away. Try to understand them and read the whole description the compiler is giving you.
+Part 1: Vector Typeclass and Vector as a list (25%)
+First, we will introduce some vector operations. The generic zipWith and map work, but are hard to read. We want something like:
+v' = v <+> dt <.> a
+So we will introduce new operators <-> and <+> and <.> and we may need to adjust the precedence of some. By default, custom operators have the highest and thus equal precedence. Equal precedence does not resolve the above expression as we want so figure out and make fix that.
+However, instead of implementing them as normal functions, we will introduce a new type class called Vector with these three operators, a “dist2” function which returns the squared distance, a “zero” function that takes an Integer argument and returns an array of that many zeroes, and a “quad” function that given the center, new radius, and a vector, gives the center of the quadrant where this vector should go. All of these functions should work for any Num type of contained data. Some functions may require additional constraints that you’ll figure out from errors. ==>> e.g. if some function necessarily requires a Floating constraint, it is okay. You do not need to also handle Integral version. <<== Any type that takes a type argument (type of contained data) can be made a member of this type class.
+Now write an instance of Vector for lists (just [] as [] is a type that takes a type argument to define the final type e.g. [Int]). All functions would be very small.==>> It will help you to keep Functor definition and Maybe definitions in front of you while designing this type class <<==
+Now we want to convert our code so it works for any Vector and not just arrays by changing types from [Double]. Don’t start by changing the Body data type. Always make breaking code changes bottom-up as you can continue to test. This change will force you to “only” use these vector operations on position, velocity, and acceleration vectors and no other operations.
+You’ll have to put necessary constraints on the functions. When all is done, you Body definition would contain an arbitrary (v Double) and Body type will be parameterized on v.
+==>> Part 2 has been removed <<==
+Part 3: Vector stored as a list inside a box (25%)
+>>> SIMPLIFIED
+We want to add a facility to handle Invalid Vectors. Define a new data type Vec that either stores a list or it is InvalidVec.
+Make Vec an instance of Vector. Your rest of code should work seamlessly once this is done as it is generalized to “any” Vector. Now make Vec a valid Functor, Applicative, and finally a Monad.
+>>> EXAMPLE ADDED AND QUESTION SIMPLIFIED
+(+) <$> (Vec [1,2]) <*> (Vec [3,4]) ... should be (Vec [4,6])
+Make the Vector Monad behave just like the List Monad except that InvVec at any stage should result in InvVec answer. My original example was wrong.
+Change your code such that readBody stores the read position and velocity vectors in Vec.
+Part 4: Foldable tree (==>> 25% <<==)
+Make visitQT take just the summaryOk function and return a new type that is an instance of “Foldable” class. A “Foldable” instance needs a single “foldr” function. Your actual tree traversal should be in foldr function. Update your call to visitQT accordingly.
+Part 5: 3D World (==>> 25% <<==)
+Extend it to support a 3D world and use an oct-tree instead of a quad tree. Following is sample input and output with the same command line arguments as Assignment 1. I'm not restrictive about output format as long as the relevant data is shown.
+>>> Do not do this part unless everything else is done.
+5
+2.50e+11
+1.4960e+11 0.0000e+00 0.0000e+00 0.0000e+00 2.9800e+04 1.0000e+04 5.9740e+24
+2.2790e+11 0.0000e+00 0.0000e+00 0.0000e+00 2.4100e+04 1.0000e+04 6.4190e+23
+5.7900e+10 0.0000e+00 0.0000e+00 0.0000e+00 4.7900e+04 1.0000e+04 3.3020e+23
+0.0000e+00 0.0000e+00 0.0000e+00 0.0000e+00 0.0000e+00 0.0000e+00 1.9890e+30
+1.0820e+11 0.0000e+00 0.0000e+00 0.0000e+00 3.5000e+04 1.0000e+04 4.8690e+24
+5
+2.50e+11
+Body [5.078190543111369e10,-1.4511867203806946e11,-4.869771168945424e10] [26723.600546602203,11417.53359494273,3831.3885932568414] 5.974e24
+Body [-2.8420960187223175e11,1.2441617448600438e11,5.162424086854718e10] [-9602.098720369362,-15121.54810487624,-6274.529278154306] 6.419e23
+Body [3.961416106374966e10,-4.3036922799246895e10,-8.984152547125792e9] [34613.39065588712,32401.841731122873,6764.465719724155] 3.302e23
+Body [970896.0958644301,6297330.674842768,1968612.5367088902] [-5.6212814179932825e-2,0.22317096908112713,6.795593486397958e-2] 1.989e30
+Body [-1.1895850818056636e11,4.092097931504531e10,1.169198844049228e10] [-11582.950480736026,-27849.914827567583,-7957.1175732730435] 4.869e24
